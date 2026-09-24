@@ -60,7 +60,7 @@ export default function NumberMindGame() {
   if (stage === "intro") {
     return (
       <main className="game-shell">
-        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill">V1.1</span></div>
+        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill">V1.2</span></div>
         <section className="game-panel intro-panel">
           <div className="mind-orb">🧠</div>
           <p className="eyebrow">เกมอ่านใจเกมแรก</p>
@@ -138,7 +138,7 @@ export default function NumberMindGame() {
         <p className="success-copy">แต่ MindPlay ก็เจอเลข <strong>{result}</strong> ที่คุณคิดไว้</p>
         <div className="reveal-actions">
           <button className="game-primary" onClick={restart}>เล่นอีกครั้ง</button>
-          <a className="ghost-link" href="/">กลับหน้าหลัก</a>
+          <a className="ghost-link" href="/games/symbol-mind">👁️ เล่นสัญลักษณ์ลับต่อ</a>\n          <a className="ghost-link" href="/">กลับหน้าหลัก</a>
         </div>
       </main>
     );

@@ -3,16 +3,17 @@ const games = [
     icon: "🔢",
     title: "อ่านตัวเลขในใจ",
     description: "คิดเลขตั้งแต่ 1–100 ไว้ในใจ แล้วตอบเพียง 7 คำถาม",
-    status: "play",
+    status: "available",
     href: "/games/number-mind",
-    badge: "ใหม่",
+    badge: "เล่นได้แล้ว",
   },
   {
     icon: "👁️",
     title: "สัญลักษณ์ลับ",
-    description: "จำสิ่งหนึ่งไว้ในหัว โดยไม่ต้องกดสิ่งที่เลือก",
-    status: "soon",
-    badge: "เร็ว ๆ นี้",
+    description: "เลือกสัญลักษณ์หนึ่งตัวไว้ในใจ โดยไม่ต้องกดสิ่งที่เลือก",
+    status: "available",
+    href: "/games/symbol-mind",
+    badge: "ใหม่",
   },
   {
     icon: "🃏",
@@ -46,7 +47,7 @@ export default function Home() {
         <p className="eyebrow">ศูนย์รวมเกมอ่านใจ</p>
         <h1>คุณแน่ใจแค่ไหน...<span>ว่าความคิดของคุณเป็นความลับ?</span></h1>
         <p className="hero-copy">คิดคำตอบไว้ในใจ ไม่ต้องบอกเรา แล้วมาดูกันว่าเราจะทายถูกหรือไม่</p>
-        <a className="primary-button" href="/games/number-mind">เริ่มอ่านใจเลย <span aria-hidden="true">🧠</span></a>
+        <a className="primary-button" href="#games">เลือกเกมที่อยากลอง <span aria-hidden="true">↓</span></a>
         <div className="trust-row" aria-label="จุดเด่นของ MindPlay">
           <span>ฟรี 100%</span><span>ไม่ต้องสมัคร</span><span>เล่นผ่านเว็บ</span><span>เหมาะกับมือถือ</span>
         </div>
@@ -55,8 +56,8 @@ export default function Home() {
       <section className="section" id="games">
         <div className="section-heading">
           <p className="eyebrow">เกมของ MindPlay</p>
-          <h2>เกมแรกเปิดให้เล่นแล้ว</h2>
-          <p>เริ่มจากเกมอ่านเลขในใจ 1–100 และจะมีเกมใหม่เพิ่มเข้ามาในเวอร์ชันถัดไป</p>
+          <h2>ตอนนี้มี 2 เกมให้ลองอ่านใจ</h2>
+          <p>เริ่มจากตัวเลข หรือเลือกสัญลักษณ์ที่ชอบ แล้วดูว่า MindPlay จะอ่านสิ่งที่อยู่ในหัวคุณได้หรือไม่</p>
         </div>
 
         <div className="game-list">
@@ -67,15 +68,15 @@ export default function Home() {
                 <div className="game-content">
                   <div className="game-title-row">
                     <h3>{game.title}</h3>
-                    <span className={game.status === "play" ? "badge badge-live" : "badge"}>{game.badge}</span>
+                    <span className={game.status === "available" ? "badge badge-live" : "badge"}>{game.badge}</span>
                   </div>
                   <p>{game.description}</p>
-                  {game.status === "play" && <span className="play-link">เล่นเลย →</span>}
+                  {game.status === "available" && <span className="play-link">เล่นเลย →</span>}
                 </div>
                 <span className="game-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               </>
             );
-            return game.status === "play" ? (
+            return game.status === "available" ? (
               <a className="game-card game-card-live" href={game.href} key={game.title}>{content}</a>
             ) : (
               <article className="game-card" key={game.title}>{content}</article>
@@ -88,7 +89,7 @@ export default function Home() {
         <p className="eyebrow">คำถามเดียว</p>
         <h2>ไม่ใช้กล้อง ไม่ใช้ไมค์ และไม่ต้องบอกคำตอบ</h2>
         <p className="mystery-question">แล้วเราจะรู้ได้ยังไง?</p>
-        <p className="muted">ลองเกมอ่านเลขในใจ แล้วพิสูจน์ด้วยตัวคุณเอง</p>
+        <p className="muted">ลองเล่นสักเกม แล้วพิสูจน์ด้วยตัวคุณเอง</p>
       </section>
 
       <section className="section about" id="about">
@@ -107,7 +108,7 @@ export default function Home() {
 
       <footer>
         <div className="footer-brand"><span>🧠</span> MindPlay</div>
-        <p>ศูนย์รวมเกมอ่านใจ — V1.1</p>
+        <p>ศูนย์รวมเกมอ่านใจ — V1.2</p>
         <p className="footer-note">คิดไว้ในใจ... ที่เหลือปล่อยให้เป็นหน้าที่ของเรา</p>
       </footer>
     </main>
