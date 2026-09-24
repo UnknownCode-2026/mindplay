@@ -1,0 +1,5 @@
+-- MindPlay V1.9 Admin Control Center
+-- Canonical production DDL is tracked in Supabase migration history:
+-- mindplay_v19_admin_control_center
+-- Adds site_settings, feature_flags, announcements, admin_audit_logs,
+-- expands game_configs, enables RLS, and adds get_mindplay_public_config().
