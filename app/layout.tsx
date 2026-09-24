@@ -5,6 +5,7 @@ import "../styles/base.css";
 import "../styles/home.css";
 import "../styles/game.css";
 import "../styles/stats.css";
+import "../styles/admin.css";
 import "../styles/motion.css";
 import "../styles/responsive.css";
 
