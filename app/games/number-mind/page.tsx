@@ -60,10 +60,10 @@ export default function NumberMindGame() {
   if (stage === "intro") {
     return (
       <main className="game-shell">
-        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill">V1.2</span></div>
+        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill">V1.3</span></div>
         <section className="game-panel intro-panel">
           <div className="mind-orb">🧠</div>
-          <p className="eyebrow">เกมอ่านใจเกมแรก</p>
+          <p className="eyebrow">โหมดคลาสสิกจาก V1.2</p>
           <h1 className="game-heading">เลือกเลขหนึ่งตัว<br/><span>ตั้งแต่ 1 ถึง 100</span></h1>
           <div className="rules">
             <p>จำมันไว้ในหัว</p>

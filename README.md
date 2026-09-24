@@ -1,36 +1,14 @@
-# 🧠 MindPlay V1.2
+# 🧠 MindPlay V1.3
+Game Rework + Responsive + Performance Update
 
-ศูนย์รวมเกมอ่านใจภาษาไทย เล่นฟรีผ่านเว็บไซต์
+## ไฮไลต์
+- 🃏 ไพ่ที่หายไป
+- 🧠 เลขที่หนีไม่พ้น
+- เกมเลขและสัญลักษณ์เดิมย้ายเป็นโหมดคลาสสิก
+- Responsive: Mobile / Tablet / Desktop
+- เพิ่ม Loading, 404, Metadata และ Open Graph
+- ปรับ Performance, Animation และ reduced motion
+- ไม่ใช้กล้อง ไมค์ Login หรือฐานข้อมูล
 
-## V1.2
-- เพิ่มเกมที่ 2: สัญลักษณ์ลับ
-- เลือกสัญลักษณ์ไว้ในใจโดยไม่ต้องกดสิ่งที่เลือก
-- ระบบคำถามแบบ Binary 4 รอบ สำหรับสัญลักษณ์ 16 แบบ
-- สุ่มลำดับคำถามและตำแหน่งสัญลักษณ์
-- Reveal Animation สำหรับ Emoji
-- Haptic Feedback บนอุปกรณ์ที่รองรับ
-- หน้าแรกแสดง 2 เกมที่เล่นได้จริง
-- เกมเลขอัปเดตเป็น V1.2 และมีปุ่มเล่นเกมสัญลักษณ์ต่อ
-- ปรับ UI/Animation ให้เข้ากับเกมใหม่
-- Mobile First และไม่ใช้กล้อง/ไมค์
-
-## เกมที่เล่นได้
-- 🔢 อ่านตัวเลขในใจ 1–100
-- 👁️ สัญลักษณ์ลับ
-
-## เทคโนโลยี
-- Next.js 16
-- React 19
-- TypeScript
-- Vercel
-
-## เริ่มต้น
-```bash
-npm install
-npm run dev
-```
-
-## Build
-```bash
-npm run build
-```
+## Tech
+Next.js 16 / React 19 / TypeScript / Vercel

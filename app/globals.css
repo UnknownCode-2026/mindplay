@@ -354,3 +354,19 @@ radial-gradient(circle at 80% 30%,rgba(159,122,234,.1),transparent 22rem)}
 .symbol-reveal-stage{background:radial-gradient(circle at 50% 45%,rgba(108,99,255,.18),transparent 18rem)}
 .symbol-reveal{font-size:clamp(7rem,38vw,13rem);line-height:1;margin:20px 0 26px;filter:drop-shadow(0 0 34px rgba(159,122,234,.45));animation:revealPop .6s cubic-bezier(.2,.85,.3,1.3)}
 @media(min-width:560px){.symbol-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* MindPlay V1.3 */
+:root{--content-max:1180px;--game-max:820px;--tap:48px}
+html{scroll-behavior:smooth}body{overflow-x:hidden}.topnav{display:flex;align-items:center;gap:14px}.topnav a{color:inherit;text-decoration:none;opacity:.78;font-size:.92rem}
+.game-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.game-meta span{font-size:.76rem;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);opacity:.82}
+.card-stage,.force-stage,.center-panel{max-width:var(--game-max);margin-inline:auto}.playing-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:26px auto;max-width:700px}
+.playing-card{min-height:120px;border-radius:18px;display:grid;place-items:center;background:#f5f2ec;color:#17131f;font-weight:800;font-size:clamp(1.7rem,7vw,2.5rem);box-shadow:0 10px 30px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.55)}
+.reveal-cards{animation:readingFade .35s ease both}.inline-action{display:flex;margin:26px auto 0;max-width:440px}.inline-actions{max-width:460px;margin-inline:auto}
+.force-step-number{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;margin:28px auto 22px;font-size:2rem;font-weight:900;background:linear-gradient(145deg,rgba(133,94,255,.24),rgba(77,214,255,.09));border:1px solid rgba(255,255,255,.09)}
+.loading-stage{min-height:100dvh}.game-card{content-visibility:auto;contain-intrinsic-size:220px}.game-panel{contain:layout paint}
+.primary-button,.game-primary,.answer-button,.ghost-button,.ghost-link,.back-button{min-height:var(--tap)}
+@media (hover:hover) and (pointer:fine){.game-card-live:hover{transform:translateY(-4px)}.primary-button:hover,.game-primary:hover{transform:translateY(-2px)}.topnav a:hover{opacity:1}}
+@media (min-width:700px){.game-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.playing-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.symbol-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.number-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.game-shell{padding-inline:clamp(24px,5vw,72px)}}
+@media (min-width:1100px){.topbar,.section,.hero,.about{max-width:var(--content-max);margin-inline:auto}.game-list{grid-template-columns:repeat(3,minmax(0,1fr))}.feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{min-height:78vh}.game-panel{max-width:920px;margin-inline:auto}.answer-bar{position:static;max-width:650px;margin:28px auto 0;background:transparent;backdrop-filter:none;padding:0}.number-grid,.symbol-grid{padding-bottom:0}}
+@media (orientation:landscape) and (max-height:650px){.hero{min-height:auto;padding-block:54px}.mind-orb,.orb{transform:scale(.88)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
