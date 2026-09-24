@@ -1,21 +1,22 @@
-# MindPlay V1.5
+# MindPlay V1.6
 
-Full UI/UX Redesign
+Immersive Motion + Game Engine Rework
 
-## สิ่งที่เปลี่ยน
-- ออกแบบหน้าเว็บไซต์ใหม่ทั้งโปรเจกต์
-- สร้าง Brand Mark และชุด SVG Icon ของ MindPlay เอง
-- ไม่ใช้ Emoji เป็นไอคอนในหน้าเว็บไซต์และเกม
-- ออกแบบ Home, Game Cards, Header, Footer, Loading และ 404 ใหม่
-- สร้าง Game Shell กลางให้ทุกเกมมีภาษาดีไซน์เดียวกัน
-- ปรับเกมทั้ง 5 หน้าให้ใช้ Custom Icon และ Controls ชุดใหม่
-- เกมสัญลักษณ์ใช้ SVG Symbol Set ของ MindPlay จำนวน 16 แบบ
-- เกมไพ่ใช้หน้าไพ่และดอกไพ่ที่วาดด้วย SVG
-- ปรับ Typography, Spacing, Grid, Focus, Hover และ Touch Target
-- Responsive สำหรับ Mobile, Tablet และ Desktop
-- CSS ถูกเขียนใหม่เป็น Design System เดียว ลด style override จากเวอร์ชันเก่า
-- เพิ่ม cleanup สำหรับ timer ในเกมตัวเลขและสัญลักษณ์
-- หน้าเว็บจริงไม่แสดงเลขเวอร์ชัน
+## Visual / UX
+- รักษาโครง UI/UX ของ V1.5 และเพิ่มสีประจำเกม
+- เพิ่ม Aurora, glow, reveal motion, scene transition และ micro-interaction
+- ใช้ Custom SVG icon ของ MindPlay ต่อเนื่อง ไม่มี Emoji ใน UI หลัก
+- รองรับ prefers-reduced-motion
+- Mobile / Tablet / Desktop responsive
 
-## Stack
-Next.js 16 / React 19 / TypeScript / Vercel
+## Game Engines
+- ไพ่ที่หายไป: 16-card Matrix + intersection decoding 2 รอบ
+- อ่านตัวเลขในใจ: Base-5 routing 3 ขั้น สำหรับเลข 1-100
+- สัญลักษณ์ลับ: Base-4 visual routing 2 ขั้น สำหรับ 16 symbols
+- เลขที่หนีไม่พ้น: Multi-routine engine (1089, 37, 9)
+- คำทำนายที่ปิดผนึก: pre-commit SHA-256 + adaptive elimination + client-side verification
+
+## Internal
+- แยก logic ไปที่ lib/games/
+- package version 1.6.0
+- หน้าเว็บไม่แสดงเลขเวอร์ชัน

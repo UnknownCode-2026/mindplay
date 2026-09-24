@@ -1,20 +1,57 @@
 "use client";
-import { useState } from "react";
+import { useCallback,useEffect,useState } from "react";
 import { GameHeader,Icon,type IconName } from "../../../components/MindPlayUI";
+import { randomNonce,sha256,shortFingerprint } from "../../../lib/games/predictionEngine";
 
-type Stage="intro"|"color"|"door"|"object"|"reveal";
-const colors=[{id:"ม่วง",className:"color-purple"},{id:"ฟ้า",className:"color-blue"},{id:"แดง",className:"color-red"}];
-const doors=["ประตูซ้าย","ประตูกลาง","ประตูขวา"];
-const objects:{label:string;icon:IconName}[]=[{label:"กุญแจ",icon:"key"},{label:"ดวงตา",icon:"eye"},{label:"พระจันทร์",icon:"moon"}];
+type Option={id:string;label:string;icon:IconName};
+type Stage="loading"|"intro"|"choice"|"reveal";
+const OPTIONS:Option[]=[
+ {id:"moon",label:"พระจันทร์",icon:"moon"},
+ {id:"key",label:"กุญแจ",icon:"key"},
+ {id:"eye",label:"ดวงตา",icon:"eye"},
+ {id:"star",label:"ดาว",icon:"star"},
+ {id:"diamond",label:"เพชร",icon:"diamond"},
+];
 
 export default function SealedPrediction(){
- const[stage,setStage]=useState<Stage>("intro");const[color,setColor]=useState("");const[door,setDoor]=useState("");const[object,setObject]=useState("");
- const restart=()=>{setColor("");setDoor("");setObject("");setStage("intro")};
- return <main className="game-shell"><GameHeader title="เส้นทางที่ปิดผนึก"/>
-  {stage==="intro"&&<section className="game-panel intro-panel"><div className="intro-icon"><Icon name="prediction"/></div><p className="eyebrow">Choice path</p><h1 className="game-heading">เลือกตามความรู้สึก<br/>ทีละหนึ่งอย่าง</h1><p className="game-lead">ไม่มีคำตอบถูกหรือผิด เกมนี้บันทึกเฉพาะตัวเลือกภายในรอบที่กำลังเล่น</p><button className="game-primary" onClick={()=>setStage("color")}>เริ่มเลือก</button></section>}
-  {stage==="color"&&<section className="game-panel choice-stage"><div className="stage-label"><span>1</span><b>สี</b></div><h1 className="question-title">สีไหนดึงสายตาคุณก่อน?</h1><div className="choice-grid">{colors.map(c=><button className="choice-card" key={c.id} onClick={()=>{setColor(c.id);setStage("door")}}><span className="choice-card-icon"><span className={"color-dot "+c.className}/></span><span><strong>{c.id}</strong><small>เลือกสีนี้</small></span></button>)}</div></section>}
-  {stage==="door"&&<section className="game-panel choice-stage"><div className="stage-label"><span>2</span><b>ประตู</b></div><h1 className="question-title">ถ้าต้องเปิดหนึ่งบาน คุณจะเลือกบานไหน?</h1><div className="choice-grid">{doors.map(d=><button className="choice-card" key={d} onClick={()=>{setDoor(d);setStage("object")}}><span className="choice-card-icon"><Icon name="door"/></span><span><strong>{d}</strong><small>เปิดเส้นทางนี้</small></span></button>)}</div></section>}
-  {stage==="object"&&<section className="game-panel choice-stage"><div className="stage-label"><span>3</span><b>วัตถุ</b></div><h1 className="question-title">เลือกสิ่งที่คุณรู้สึกเชื่อมโยงมากที่สุด</h1><div className="choice-grid">{objects.map(o=><button className="choice-card" key={o.label} onClick={()=>{setObject(o.label);setStage("reveal")}}><span className="choice-card-icon"><Icon name={o.icon}/></span><span><strong>{o.label}</strong><small>เลือกสิ่งนี้</small></span></button>)}</div></section>}
-  {stage==="reveal"&&<section className="game-panel intro-panel"><p className="eyebrow">Your path</p><h1 className="game-heading">เส้นทางที่คุณสร้างขึ้น</h1><div className="sealed-card"><div className="sealed-item"><Icon name="palette"/><span>{color}</span></div><div className="sealed-item"><Icon name="door"/><span>{door}</span></div><div className="sealed-item"><Icon name={objects.find(o=>o.label===object)?.icon??"key"}/><span>{object}</span></div></div><p className="game-lead">การ์ดนี้สรุปตัวเลือกของรอบปัจจุบันเท่านั้น และไม่ได้อ่านข้อมูลส่วนตัวจากอุปกรณ์</p><div className="reveal-actions"><button className="game-primary" onClick={restart}>เล่นอีกครั้ง</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div></section>}
+ const[stage,setStage]=useState<Stage>("loading");
+ const[target,setTarget]=useState<Option|null>(null);
+ const[nonce,setNonce]=useState("");
+ const[hash,setHash]=useState("");
+ const[candidates,setCandidates]=useState<Option[]>(OPTIONS);
+ const[round,setRound]=useState(1);
+ const[lastAction,setLastAction]=useState("");
+ const[verified,setVerified]=useState<boolean|null>(null);
+
+ const setup=useCallback(async()=>{
+   setStage("loading");setCandidates(OPTIONS);setRound(1);setLastAction("");setVerified(null);
+   const random=new Uint32Array(1);crypto.getRandomValues(random);
+   const chosen=OPTIONS[random[0]%OPTIONS.length];
+   const nextNonce=randomNonce();
+   const nextHash=await sha256(chosen.id+":"+nextNonce);
+   setTarget(chosen);setNonce(nextNonce);setHash(nextHash);setStage("intro");
+ },[]);
+
+ useEffect(()=>{void setup()},[setup]);
+
+ const choose=async(option:Option)=>{
+   if(!target||candidates.length<=1)return;
+   const removable=candidates.find(item=>item.id!==target.id);
+   const removeId=option.id===target.id?(removable?.id??option.id):option.id;
+   const next=candidates.filter(item=>item.id!==removeId);
+   setLastAction(option.id===target.id?"ตัวเลือกนี้ถูกยึดเป็นจุดอ้างอิง":"ตัวเลือกนี้ถูกปล่อยออกจากสนาม");
+   setCandidates(next);
+   if(next.length===1){
+     const check=await sha256(target.id+":"+nonce);
+     setVerified(check===hash);
+     window.setTimeout(()=>setStage("reveal"),420);
+   }else setRound(v=>v+1);
+ };
+
+ return <main className="game-shell game-theme-prediction"><div className="game-aurora" aria-hidden="true"/><GameHeader title="คำทำนายที่ปิดผนึก"/>
+  {stage==="loading"&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon motion-pulse"><Icon name="prediction"/></div><p className="eyebrow">Preparing commitment</p><h1 className="game-heading">กำลังปิดผนึกคำทำนาย</h1></section>}
+  {stage==="intro"&&target&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon seal-motion"><Icon name="prediction"/></div><p className="eyebrow">SHA-256 commitment</p><h1 className="game-heading">คำตอบหนึ่งชิ้น<br/>ถูกล็อกไว้ก่อนคุณเลือก</h1><p className="game-lead">Fingerprint ด้านล่างสร้างจากคำตอบเป้าหมายและ nonce ก่อนเริ่มเกม คุณจะตรวจสอบความตรงกันได้ตอนจบ</p><div className="commitment-card"><span>SEALED FINGERPRINT</span><strong>{shortFingerprint(hash)}</strong><small>สร้างก่อนการตัดสินใจรอบแรก</small></div><button className="game-primary" onClick={()=>setStage("choice")}>เริ่มตัดสินใจ</button></section>}
+  {stage==="choice"&&<section className="game-panel choice-stage scene-enter"><div className="progress-track"><div className="progress-fill prediction-progress" style={{width:`${((OPTIONS.length-candidates.length)/(OPTIONS.length-1))*100}%`}}/></div><div className="stage-label"><span>{round}</span><b>Adaptive choice</b></div><h1 className="question-title">แตะสิ่งที่ดึงดูดคุณที่สุดในรอบนี้</h1><p className="question-help">การแตะแต่ละครั้งจะเปลี่ยนสนาม จนเหลือเส้นทางสุดท้ายเพียงหนึ่ง</p>{lastAction&&<p className="choice-feedback">{lastAction}</p>}<div className="prediction-choice-grid">{candidates.map(option=><button className="prediction-choice" key={option.id} onClick={()=>void choose(option)}><span><Icon name={option.icon}/></span><b>{option.label}</b></button>)}</div><div className="commitment-mini"><span>{shortFingerprint(hash)}</span><small>Fingerprint เดิม ไม่เปลี่ยนระหว่างเกม</small></div></section>}
+  {stage==="reveal"&&target&&<section className="game-panel intro-panel scene-enter reveal-scene"><p className="eyebrow">Commitment revealed</p><div className="prediction-reveal"><Icon name={target.icon}/><span className="prediction-orbit"/></div><h1 className="reveal-question">{target.label}</h1><p className="game-lead">นี่คือเป้าหมายที่ถูกใช้สร้าง Fingerprint ตั้งแต่ก่อนคุณเริ่มเลือก</p><div className="verification-card"><span className={verified?"verify-dot ok":"verify-dot"}/><div><strong>{verified?"ตรวจสอบ SHA-256 ตรงกัน":"ไม่สามารถยืนยันได้"}</strong><small>{shortFingerprint(hash)}</small></div></div><details className="proof-details"><summary>ดูข้อมูลสำหรับตรวจสอบ</summary><code>target={target.id}</code><code>nonce={nonce}</code><code>sha256={hash}</code></details><div className="reveal-actions"><button className="game-primary" onClick={()=>void setup()}>สร้างคำทำนายใหม่</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div></section>}
  </main>;
 }

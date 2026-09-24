@@ -1,43 +1,17 @@
 "use client";
-import { useEffect,useMemo,useState } from "react";
-import { GameHeader, Icon } from "../../../components/MindPlayUI";
+import { useMemo,useState } from "react";
+import { GameHeader,Icon } from "../../../components/MindPlayUI";
+import { getRoutine } from "../../../lib/games/mathEngine";
 
-type Stage="intro"|"steps"|"reading"|"reveal";
-const sequences=[
- {steps:["คิดเลขอะไรก็ได้ตั้งแต่ 1 ถึง 9","คูณเลขนั้นด้วย 2","บวก 10","หารด้วย 2","ลบเลขแรกที่คุณคิดไว้"],result:5},
- {steps:["คิดเลขอะไรก็ได้ตั้งแต่ 1 ถึง 9","คูณเลขนั้นด้วย 2","บวก 14","หารด้วย 2","ลบเลขแรกที่คุณคิดไว้"],result:7},
- {steps:["คิดเลขอะไรก็ได้ตั้งแต่ 1 ถึง 9","คูณเลขนั้นด้วย 2","บวก 18","หารด้วย 2","ลบเลขแรกที่คุณคิดไว้"],result:9}
-];
-
+type Stage="intro"|"steps"|"reveal";
 export default function MathForceGame(){
  const[stage,setStage]=useState<Stage>("intro");const[step,setStep]=useState(0);const[run,setRun]=useState(0);
- const seq=useMemo(()=>sequences[run%sequences.length],[run]);
- useEffect(()=>{if(stage!=="reading")return;const timer=window.setTimeout(()=>setStage("reveal"),1450);return()=>window.clearTimeout(timer)},[stage]);
+ const routine=useMemo(()=>getRoutine(run),[run]);
+ const next=()=>{if(step<routine.steps.length-1)setStep(v=>v+1);else setStage("reveal")};
  const restart=()=>{setRun(v=>v+1);setStep(0);setStage("intro")};
- const next=()=>{if(step<seq.steps.length-1)setStep(v=>v+1);else setStage("reading")};
- return <main className="game-shell">
-  <GameHeader title="เลขที่หนีไม่พ้น"/>
-  {stage==="intro"&&<section className="game-panel intro-panel">
-   <div className="intro-icon"><Icon name="math"/></div><p className="eyebrow">Mental calculation</p>
-   <h1 className="game-heading">คุณเลือกเลขเอง<br/>เราไม่ต้องเห็นมัน</h1>
-   <p className="game-lead">ทำตามทีละขั้นโดยเก็บเลขทั้งหมดไว้กับตัวเอง แล้วดูว่าผลสุดท้ายจะลงเอยตรงไหน</p>
-   <button className="game-primary" onClick={()=>setStage("steps")}>เริ่มคำนวณ</button>
-  </section>}
-  {stage==="steps"&&<section className="game-panel">
-   <div className="progress-track"><div className="progress-fill" style={{width:`${((step+1)/seq.steps.length)*100}%`}}/></div>
-   <div className="stage-label"><span>{step+1}</span><b>ขั้นที่ {step+1} จาก {seq.steps.length}</b></div>
-   <h1 className="question-title">{seq.steps[step]}</h1>
-   <p className="question-help">ทำขั้นนี้ให้เสร็จก่อน แล้วค่อยกดไปต่อ</p>
-   <button className="game-primary" onClick={next}>{step===seq.steps.length-1?"เปิดผลลัพธ์":"ขั้นต่อไป"}</button>
-  </section>}
-  {stage==="reading"&&<section className="game-panel intro-panel">
-   <div className="reading-icon"><Icon name="brand"/></div><p className="eyebrow">Processing</p>
-   <h1 className="game-heading">ตรวจเส้นทางของตัวเลข</h1><p className="game-lead">เลขแรกยังอยู่กับคุณ เรากำลังตรวจเฉพาะโครงสร้างของขั้นตอน</p>
-  </section>}
-  {stage==="reveal"&&<section className="game-panel intro-panel">
-   <p className="eyebrow">Final result</p><div className="reveal-number">{seq.result}</div>
-   <h1 className="reveal-question">นี่คือเลขที่คุณได้ใช่ไหม?</h1>
-   <div className="reveal-actions"><button className="game-primary" onClick={restart}>เล่นอีกครั้ง</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div>
-  </section>}
+ return <main className="game-shell game-theme-math"><div className="game-aurora" aria-hidden="true"/><GameHeader title="เลขที่หนีไม่พ้น"/>
+  {stage==="intro"&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon motion-float"><Icon name="math"/></div><p className="eyebrow">{routine.label}</p><h1 className="game-heading">{routine.intro}</h1><p className="game-lead">แต่ละรอบใช้รูทีนคณิตศาสตร์คนละโครงสร้าง จึงไม่วนสูตรคูณสองแบบเดิมทุกครั้ง</p><div className="rules">{routine.rules.map(rule=><p key={rule}>{rule}</p>)}</div><button className="game-primary" onClick={()=>setStage("steps")}>เริ่มรูทีนนี้</button></section>}
+  {stage==="steps"&&<section className="game-panel scene-enter"><div className="progress-track"><div className="progress-fill" style={{width:`${((step+1)/routine.steps.length)*100}%`}}/></div><div className="stage-label"><span>{step+1}</span><b>{routine.label}</b></div><h1 className="question-title">{routine.steps[step]}</h1><p className="question-help">ทำขั้นนี้ให้เสร็จก่อนแล้วค่อยไปต่อ</p><div className="math-energy"><span/><span/><span/></div><button className="game-primary" onClick={next}>{step===routine.steps.length-1?"เปิดผลลัพธ์":"ขั้นต่อไป"}</button></section>}
+  {stage==="reveal"&&<section className="game-panel intro-panel scene-enter reveal-scene"><p className="eyebrow">Forced result</p><div className="reveal-number">{routine.result}</div><h1 className="reveal-question">นี่คือผลลัพธ์สุดท้ายของคุณ</h1><p className="game-lead">{routine.resultNote}</p><div className="reveal-actions"><button className="game-primary" onClick={restart}>ลองรูทีนอื่น</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div></section>}
  </main>;
 }
