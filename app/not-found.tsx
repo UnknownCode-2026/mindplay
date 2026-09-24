@@ -1,1 +1,2 @@
-export default function NotFound(){return <main className="game-shell center-stage"><div className="success-icon">🧠</div><p className="eyebrow">404</p><h1 className="reading-title">MindPlay หาเส้นทางนี้ไม่เจอ</h1><p className="success-copy">หน้าที่คุณกำลังหาอาจถูกย้าย หรือยังไม่มีในเวอร์ชันนี้</p><div className="reveal-actions"><a className="ghost-link" href="/">กลับหน้าหลัก</a></div></main>}
+import { BrandMark, Icon } from "../components/MindPlayUI";
+export default function NotFound(){return <main className="system-page"><div className="system-mark"><BrandMark/></div><p className="eyebrow">404</p><h1>ไม่พบหน้าที่คุณกำลังหา</h1><p>เส้นทางนี้อาจถูกย้ายหรือไม่มีอยู่แล้ว</p><a className="button button-primary" href="/">กลับหน้าหลัก <Icon name="arrowRight"/></a></main>}
