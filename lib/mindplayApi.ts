@@ -103,3 +103,8 @@ export async function getStats(days:0|1|7|30|90=30){
   const response=await callApi<{ok:true;data:MindPlayStats}>({action:"stats",days});
   return response.data;
 }
+
+
+export type PublicGameConfig={game_id:GameId;title:string;description:string|null;badge:string|null;enabled:boolean;sort_order:number;maintenance:boolean;maintenance_message:string;difficulty:string;question_limit:number|null;engine_version:string};
+export type PublicConfig={site:{site_name:string;hero_title:string;hero_description:string;maintenance_mode:boolean;maintenance_message:string;public_stats_enabled:boolean;home_stats_enabled:boolean};features:Record<string,boolean>;games:PublicGameConfig[];announcement:{id:number;title:string;body:string}|null};
+export async function getPublicConfig(){const response=await callApi<{ok:true;data:PublicConfig}>({action:"public_config"});return response.data}
