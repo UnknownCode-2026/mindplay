@@ -1,29 +1,41 @@
-# MindPlay V1.7
+# MindPlay V1.8
 
-Magic Mind Reading Rebuild
+Supabase Game Platform & Analytics
 
-## Main games
-- ไพ่ในความคิด — ไพ่ 21 ใบและการตามรอยผ่าน 3 ช่วง
-- เลขที่คุณกำลังคิด — เลข 1–50 และคำถามเบาะแสแบบ adaptive
-- สัญลักษณ์ในใจ — ชุด SVG ของ MindPlay และคำถามลักษณะของรูป
-- คำที่ซ่อนอยู่ในหัว — เกมทายคำจากคลังคำควบคุมและ semantic questions
-- คำทำนายที่ปิดผนึก — เส้นทางตัวเลือกแบบมายากลและ reveal
+## Main upgrade
+- เชื่อม MindPlay กับ Supabase Project จริง
+- Anonymous analytics โดยไม่ต้องสมัครสมาชิก
+- เก็บ Page Views, Visitors, Game Start, Completion, Correct/Wrong, Replay และ Share
+- เพิ่มหน้า /stats พร้อมช่วง วันนี้ / 7 วัน / 30 วัน / 90 วัน / ทั้งหมด
+- เพิ่ม Game Session สำหรับทุกเกม
+- ย้าย Game Engine ของ Number / Symbol / Word ไปประมวลผลฝั่ง Supabase Edge Function
 
-## UX
-- ทุกเกมมีหน้าวิธีเล่นก่อนเริ่ม
-- ปุ่ม ? เปิดวิธีเล่นซ้ำได้ตลอด
-- Flow กลาง: วิธีเล่น → คิด/จำ → interaction → focus → reveal → reaction
-- เพิ่มหน้าตรง/ไม่ตรง เล่นใหม่ และ Web Share
-- หน้า Home ไม่เปิดเผยชื่อ algorithm หรือกลไกเชิงเทคนิค
-- ภาษาไทยเป็นหลัก และไม่มี Emoji เป็นไอคอนหลัก
+## Game architecture
+- Number Mind: Candidate state และคำถามถัดไปอยู่ฝั่ง Game Engine
+- Symbol Mind: Client ได้เฉพาะรายการสัญลักษณ์และคำถามปัจจุบัน
+- Word Mind: Client ได้เฉพาะรายการคำและคำถามปัจจุบัน
+- Card Mind / Sealed Prediction: เกมยังตอบสนองฝั่ง Client แต่มี Supabase session + analytics
+- Analytics ล้มเหลวไม่ทำให้เกม Client-side พัง
+- Server-assisted games จะแสดง Retry หาก Game Engine ขัดข้อง แทนการเฉลยแบบเดาสุ่ม
 
-## UI / Responsive
-- คงแบรนด์ Custom SVG จาก V1.5
-- ลด motion ที่ทำงานพร้อมกันและเน้นช่วง reveal
-- แยก CSS เป็น tokens/base/home/game/motion/responsive
-- Mobile / Tablet / Desktop และ prefers-reduced-motion
+## Privacy / Security
+- ไม่มี Login
+- ไม่ใช้กล้องหรือไมค์
+- Anonymous visitor ID หมุนใหม่ทุกประมาณ 24 ชั่วโมง
+- ไม่เก็บชื่อ อีเมล หรือข้อมูลระบุตัวตน
+- ตาราง Supabase เปิด RLS และปฏิเสธ anon/authenticated โดยตรง
+- Browser ติดต่อผ่าน Edge Function เท่านั้น
+- Secret/service role ไม่อยู่ใน GitHub หรือ frontend
 
-## Internal
-- สร้าง engine ใหม่ใน lib/games/*V17.ts
-- Math trick เดิมออกจาก Main Collection และ route เดิม redirect ไปเกมทายคำ
-- package version 1.7.0
+## Supabase
+- Project: MindPlay
+- Region: ap-southeast-1
+- Tables: visitor_sessions, game_sessions, analytics_events, game_configs
+- RPC: get_mindplay_stats
+- Edge Function: mindplay-api
+
+## UI
+- หน้า Home แสดงภาพรวมสถิติแบบกระชับ
+- หน้า Stats responsive บน Mobile / Tablet / Desktop
+- คงดีไซน์ V1.7 และ Custom SVG icon
+- package version 1.8.0

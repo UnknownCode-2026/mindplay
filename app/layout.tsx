@@ -1,8 +1,10 @@
 import type { Metadata,Viewport } from "next";
+import PageAnalytics from "../components/PageAnalytics";
 import "../styles/tokens.css";
 import "../styles/base.css";
 import "../styles/home.css";
 import "../styles/game.css";
+import "../styles/stats.css";
 import "../styles/motion.css";
 import "../styles/responsive.css";
 
@@ -13,4 +15,4 @@ export const metadata:Metadata={
  openGraph:{title:"MindPlay — เกมมายากลและทายใจ",description:"คิดอะไรไว้ในใจ แล้วลองซ่อนมันจาก MindPlay",url:"https://mindplay-silk.vercel.app",siteName:"MindPlay",locale:"th_TH",type:"website"}
 };
 export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:"cover",themeColor:"#070a12"};
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="th"><body>{children}</body></html>}
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="th"><body><PageAnalytics/>{children}</body></html>}
