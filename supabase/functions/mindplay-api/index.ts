@@ -352,6 +352,106 @@ Deno.serve(async(req:Request)=>{
    return json(req,{ok:true});
   }
 
+  if(action==="public_config"){
+   const res=await fetch(SUPABASE_URL+"/rest/v1/rpc/get_mindplay_public_config",{
+    method:"POST",
+    headers:dbHeaders(),
+    body:"{}"
+   });
+   if(!res.ok)throw new Error("public_config_"+res.status+"_"+(await res.text()).slice(0,160));
+   const data=await res.json();
+   return json(req,{ok:true,data});
+  }
+
+  if(action==="admin_snapshot"){
+   const token=(body as any).adminToken;
+   if(typeof token!=="string"||token.length<24)return json(req,{error:"admin_unauthorized"},403);
+   const authRes=await fetch(SUPABASE_URL+"/auth/v1/user",{
+    headers:{
+     "apikey":SECRET,
+     "Authorization":"Bearer "+token
+    }
+   });
+   if(!authRes.ok)return json(req,{error:"admin_unauthorized"},403);
+   const user=await authRes.json();
+   if(user?.app_metadata?.role!=="admin")return json(req,{error:"admin_forbidden"},403);
+
+   const [site,games,flags,announcements,audits,statsRes]=await Promise.all([
+    db("site_settings?id=eq.1&select=*"),
+    db("game_configs?select=*&order=sort_order.asc"),
+    db("feature_flags?select=*&order=key.asc"),
+    db("announcements?select=*&order=created_at.desc&limit=20"),
+    db("admin_audit_logs?select=*&order=created_at.desc&limit=30"),
+    fetch(SUPABASE_URL+"/rest/v1/rpc/get_mindplay_stats",{method:"POST",headers:dbHeaders(),body:JSON.stringify({p_days:30})})
+   ]);
+   const stats=statsRes.ok?await statsRes.json():null;
+   return json(req,{ok:true,data:{site:Array.isArray(site)?site[0]||null:null,games,flags,announcements,audits,stats}});
+  }
+
+  if(action==="admin_update"){
+   const token=(body as any).adminToken;
+   if(typeof token!=="string"||token.length<24)return json(req,{error:"admin_unauthorized"},403);
+   const authRes=await fetch(SUPABASE_URL+"/auth/v1/user",{headers:{"apikey":SECRET,"Authorization":"Bearer "+token}});
+   if(!authRes.ok)return json(req,{error:"admin_unauthorized"},403);
+   const user=await authRes.json();
+   if(user?.app_metadata?.role!=="admin")return json(req,{error:"admin_forbidden"},403);
+
+   const target=(body as any).target;
+   const payload=(body as any).payload;
+   if(!payload||typeof payload!=="object"||Array.isArray(payload))return json(req,{error:"invalid_payload"},400);
+
+   const audit=async(actionName:string,targetType:string,targetId:string|null,detail:unknown)=>{
+    await db("admin_audit_logs",{method:"POST",headers:dbHeaders("return=minimal"),body:JSON.stringify({action:actionName,target_type:targetType,target_id:targetId,detail:cleanMeta(detail)})});
+   };
+
+   if(target==="site"){
+    const allowed=["site_name","hero_title","hero_description","announcement_enabled","announcement_text","maintenance_mode","maintenance_message","public_stats_enabled","home_stats_enabled"];
+    const safe:Object=Object.fromEntries(Object.entries(payload).filter(([k])=>allowed.includes(k)));
+    await db("site_settings?id=eq.1",{method:"PATCH",headers:dbHeaders("return=minimal"),body:JSON.stringify({...safe,updated_at:new Date().toISOString()})});
+    await audit("update_site","site_settings","1",safe);
+    return json(req,{ok:true});
+   }
+
+   if(target==="game"){
+    const gameId=(body as any).gameId;
+    if(!isGameId(gameId))return json(req,{error:"invalid_game"},400);
+    const allowed=["title","description","badge","enabled","sort_order","maintenance","maintenance_message","difficulty","question_limit","engine_version"];
+    const safe:Object=Object.fromEntries(Object.entries(payload).filter(([k])=>allowed.includes(k)));
+    await db("game_configs?game_id=eq."+encodeURIComponent(gameId),{method:"PATCH",headers:dbHeaders("return=minimal"),body:JSON.stringify({...safe,updated_at:new Date().toISOString()})});
+    await audit("update_game","game_configs",gameId,safe);
+    return json(req,{ok:true});
+   }
+
+   if(target==="feature"){
+    const key=(body as any).key;
+    if(typeof key!=="string")return json(req,{error:"invalid_feature"},400);
+    const safe={enabled:Boolean((payload as any).enabled),updated_at:new Date().toISOString()};
+    await db("feature_flags?key=eq."+encodeURIComponent(key),{method:"PATCH",headers:dbHeaders("return=minimal"),body:JSON.stringify(safe)});
+    await audit("update_feature","feature_flags",key,safe);
+    return json(req,{ok:true});
+   }
+
+   if(target==="announcement"){
+    const mode=(body as any).mode;
+    if(mode==="create"){
+     const title=String((payload as any).title||"").slice(0,120),bodyText=String((payload as any).body||"").slice(0,1000);
+     if(!title||!bodyText)return json(req,{error:"invalid_announcement"},400);
+     const rows=await db("announcements",{method:"POST",headers:dbHeaders("return=representation"),body:JSON.stringify({title,body:bodyText,enabled:Boolean((payload as any).enabled??true)})});
+     const item=Array.isArray(rows)?rows[0]:null;await audit("create_announcement","announcements",item?.id?String(item.id):null,{title,enabled:item?.enabled});
+     return json(req,{ok:true,data:item});
+    }
+    if(mode==="toggle"){
+     const id=Number((body as any).id);if(!Number.isFinite(id))return json(req,{error:"invalid_announcement"},400);
+     const safe={enabled:Boolean((payload as any).enabled),updated_at:new Date().toISOString()};
+     await db("announcements?id=eq."+id,{method:"PATCH",headers:dbHeaders("return=minimal"),body:JSON.stringify(safe)});
+     await audit("toggle_announcement","announcements",String(id),safe);
+     return json(req,{ok:true});
+    }
+   }
+
+   return json(req,{error:"unknown_admin_target"},400);
+  }
+
   if(action==="stats"){
    const raw=Number((body as any).days);
    const days=[0,1,7,30,90].includes(raw)?raw:30;
