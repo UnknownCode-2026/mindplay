@@ -1,2 +1,2 @@
 import { BrandMark } from "../components/MindPlayUI";
-export default function Loading(){return <main className="system-page" aria-live="polite"><div className="system-mark"><BrandMark/></div><p className="eyebrow">MindPlay</p><h1>กำลังเตรียมพื้นที่เล่น</h1><div className="loading-bar"><span/></div></main>}
+export default function Loading(){return <main className="system-page" aria-live="polite"><BrandMark/><p className="eyebrow">MindPlay</p><h1>กำลังเตรียมเกม</h1><div className="system-loader"><span/></div></main>}

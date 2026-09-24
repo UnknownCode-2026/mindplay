@@ -1,2 +1,2 @@
-import { BrandMark, Icon } from "../components/MindPlayUI";
-export default function NotFound(){return <main className="system-page"><div className="system-mark"><BrandMark/></div><p className="eyebrow">404</p><h1>ไม่พบหน้าที่คุณกำลังหา</h1><p>เส้นทางนี้อาจถูกย้ายหรือไม่มีอยู่แล้ว</p><a className="button button-primary" href="/">กลับหน้าหลัก <Icon name="arrowRight"/></a></main>}
+import { BrandMark,Icon } from "../components/MindPlayUI";
+export default function NotFound(){return <main className="system-page"><BrandMark/><p className="eyebrow">404</p><h1>ไม่พบหน้าที่คุณกำลังหา</h1><p>กลับไปเลือกเกมจากหน้าหลักได้ทันที</p><a className="button primary" href="/">กลับหน้าหลัก <Icon name="arrowRight"/></a></main>}

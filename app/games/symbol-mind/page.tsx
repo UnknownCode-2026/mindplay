@@ -1,21 +1,37 @@
 "use client";
 import { useMemo,useState } from "react";
-import { GameHeader,Icon } from "../../../components/MindPlayUI";
-import { SYMBOLS } from "../../../lib/symbolMind";
-import { symbolGroups,decodeSymbol } from "../../../lib/games/symbolEngine";
+import { GameFrame,HowToPlay,FocusStage,ReactionStage } from "../../../components/GameExperience";
+import { Icon } from "../../../components/MindPlayUI";
+import { MIND_SYMBOLS,nextSymbolQuestion,applySymbolAnswer } from "../../../lib/games/symbolMindV17";
 
-type Stage="intro"|"round1"|"round2"|"reveal";
-export default function SymbolMindGame(){
- const[stage,setStage]=useState<Stage>("intro");const[first,setFirst]=useState<number|null>(null);const[seed,setSeed]=useState(19);const[resultId,setResultId]=useState<number|null>(null);
- const groups1=useMemo(()=>symbolGroups(0,seed),[seed]);const groups2=useMemo(()=>symbolGroups(1,seed+67),[seed]);
- const result=resultId?SYMBOLS.find(x=>x.id===resultId)??null:null;
- const restart=()=>{setFirst(null);setResultId(null);setSeed(v=>v+83);setStage("intro")};
- const chooseSecond=(key:number)=>{if(first===null)return;const found=decodeSymbol(first,key);setResultId(found?.id??null);setStage("reveal")};
+type Stage="guide"|"think"|"questions"|"reading"|"result";
+const steps=[
+ "มองสัญลักษณ์ทั้งหมดแล้วเลือกหนึ่งรูปไว้ในใจ โดยไม่ต้องกดรูปนั้น",
+ "จำรูปร่างเดิมไว้จนจบเกม",
+ "ตอบคำถามจากความรู้สึกและลักษณะของสัญลักษณ์ที่คุณเลือก",
+ "เมื่อคำถามจบ ให้โฟกัสรูปเดิมไว้จน MindPlay เปิดคำตอบ"
+];
 
- return <main className="game-shell game-theme-symbol"><div className="game-aurora" aria-hidden="true"/><GameHeader title="สัญลักษณ์ลับ"/>
-  {stage==="intro"&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon motion-orbit"><Icon name="symbol"/></div><p className="eyebrow">Visual routing</p><h1 className="game-heading">เลือกหนึ่งสัญลักษณ์<br/>จากทั้งหมด 16 แบบ</h1><p className="game-lead">รอบนี้ลดจาก 4 คำถามแบบมีหรือไม่มี เหลือเพียง 2 สนามภาพที่จัดกลุ่มต่างกัน</p><div className="symbol-preview-grid">{SYMBOLS.map(item=><span className="symbol-preview-item" key={item.id}><Icon name={item.icon}/></span>)}</div><button className="game-primary" onClick={()=>setStage("round1")}>ฉันเลือกแล้ว</button></section>}
-  {stage==="round1"&&<section className="game-panel scene-enter"><div className="progress-track"><div className="progress-fill" style={{width:"50%"}}/></div><div className="stage-label"><span>1</span><b>Constellations</b></div><h1 className="question-title">สัญลักษณ์ของคุณอยู่ในกลุ่มไหน?</h1><p className="question-help">เลือกทั้งกลุ่มที่มีรูปที่คุณจำไว้</p><div className="symbol-field-grid">{groups1.map((group,index)=><button className="symbol-field" key={group.key} onClick={()=>{setFirst(group.key);setStage("round2")}}><span>CONSTELLATION {index+1}</span><b>{group.items.map(item=><i key={item.id}><Icon name={item.icon}/></i>)}</b></button>)}</div></section>}
-  {stage==="round2"&&<section className="game-panel scene-enter"><div className="progress-track"><div className="progress-fill" style={{width:"100%"}}/></div><div className="stage-label"><span>2</span><b>Echo fields</b></div><h1 className="question-title">หลังจัดใหม่ รูปของคุณอยู่สนามไหน?</h1><p className="question-help">นี่คือการจัดกลุ่มคนละแกนกับรอบแรก</p><div className="symbol-field-grid">{groups2.map((group,index)=><button className="symbol-field" key={group.key} onClick={()=>chooseSecond(group.key)}><span>ECHO {index+1}</span><b>{group.items.map(item=><i key={item.id}><Icon name={item.icon}/></i>)}</b></button>)}</div></section>}
-  {stage==="reveal"&&result&&<section className="game-panel intro-panel scene-enter reveal-scene"><p className="eyebrow">Visual lock</p><div className="symbol-reveal motion-pulse"><Icon name={result.icon}/></div><h1 className="reveal-question">{result.name}</h1><p className="game-lead">สองกลุ่มที่คุณเลือกตัดกันที่สัญลักษณ์เดียว</p><div className="reveal-actions"><button className="game-primary" onClick={restart}>เล่นรอบใหม่</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div></section>}
- </main>;
+export default function SymbolMind(){
+ const[stage,setStage]=useState<Stage>("guide");
+ const[candidates,setCandidates]=useState(MIND_SYMBOLS);
+ const[asked,setAsked]=useState<string[]>([]);
+ const question=useMemo(()=>nextSymbolQuestion(candidates,asked),[candidates,asked]);
+ const result=candidates.length===1?candidates[0]:null;
+
+ const answer=(value:boolean)=>{
+  if(!question)return;
+  const next=applySymbolAnswer(candidates,question,value);
+  setCandidates(next);setAsked(prev=>[...prev,question.id]);
+  if(next.length<=1){setStage("reading");window.setTimeout(()=>setStage("result"),900)}
+ };
+ const restart=()=>{setCandidates(MIND_SYMBOLS);setAsked([]);setStage("guide")};
+
+ return <GameFrame title="สัญลักษณ์ในใจ" tone="symbol" steps={steps}>
+  {stage==="guide"&&<HowToPlay icon="symbol" title="สัญลักษณ์ในใจ" intro="เลือกหนึ่งรูปด้วยสายตา แล้วตอบเพียงความรู้สึกเกี่ยวกับรูปนั้นโดยไม่ต้องบอกชื่อสัญลักษณ์" steps={steps} onStart={()=>setStage("think")}/>}
+  {stage==="think"&&<section className="stage stage-enter"><p className="mini-kicker">เลือกหนึ่งรูป</p><h1>จำสัญลักษณ์ที่ดึงสายตาคุณ</h1><p className="stage-copy">อย่ากดรูปที่เลือก แค่มองและจำมันไว้</p><div className="symbol-cloud">{MIND_SYMBOLS.map(symbol=><span key={symbol.id} className="symbol-tile" aria-label={symbol.name}><Icon name={symbol.icon}/></span>)}</div><button className="primary-control" onClick={()=>setStage("questions")}>ฉันจำแล้ว</button></section>}
+  {stage==="questions"&&question&&<section className="stage stage-center stage-enter question-stage"><p className="mini-kicker">จับความรู้สึก {asked.length+1}</p><h1>{question.text}</h1><p className="stage-copy">เลือกคำตอบที่ตรงกับรูปในหัวคุณมากที่สุด</p><div className="binary-choice"><button className="choice-control" onClick={()=>answer(true)}>{question.yes}</button><button className="choice-control" onClick={()=>answer(false)}>{question.no}</button></div></section>}
+  {stage==="reading"&&<FocusStage icon="eye" title="นึกถึงเส้นของรูปนั้น..." copy="พยายามเห็นสัญลักษณ์เดิมให้ชัดที่สุด"/>}
+  {stage==="result"&&result&&<ReactionStage icon={result.icon} label={result.name} detail="นี่คือรูปที่คุณเลือกไว้ในใจใช่ไหม?" onRestart={restart}/>}
+ </GameFrame>;
 }

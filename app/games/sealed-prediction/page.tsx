@@ -1,57 +1,63 @@
 "use client";
-import { useCallback,useEffect,useState } from "react";
-import { GameHeader,Icon,type IconName } from "../../../components/MindPlayUI";
-import { randomNonce,sha256,shortFingerprint } from "../../../lib/games/predictionEngine";
+import { useEffect,useState } from "react";
+import { GameFrame,HowToPlay,FocusStage,ReactionStage } from "../../../components/GameExperience";
+import { Icon } from "../../../components/MindPlayUI";
+import { PREDICTION_ITEMS,createTarget,type PredictionItem } from "../../../lib/games/predictionMindV17";
 
-type Option={id:string;label:string;icon:IconName};
-type Stage="loading"|"intro"|"choice"|"reveal";
-const OPTIONS:Option[]=[
- {id:"moon",label:"พระจันทร์",icon:"moon"},
- {id:"key",label:"กุญแจ",icon:"key"},
- {id:"eye",label:"ดวงตา",icon:"eye"},
- {id:"star",label:"ดาว",icon:"star"},
- {id:"diamond",label:"เพชร",icon:"diamond"},
+type Stage="guide"|"sealed"|"choice"|"reading"|"result";
+const steps=[
+ "MindPlay จะปิดผนึกหนึ่งภาพไว้ก่อนที่คุณจะเริ่มเลือก",
+ "ในแต่ละรอบ แตะสิ่งที่ดึงสายตาคุณมากที่สุดโดยไม่คิดนาน",
+ "สนามจะค่อย ๆ เปลี่ยนไปจนเหลือเส้นทางสุดท้ายเพียงหนึ่ง",
+ "ตอนจบเราจะเปิดสิ่งที่ถูกปิดผนึกไว้ตั้งแต่ก่อนเริ่ม"
 ];
 
 export default function SealedPrediction(){
- const[stage,setStage]=useState<Stage>("loading");
- const[target,setTarget]=useState<Option|null>(null);
- const[nonce,setNonce]=useState("");
- const[hash,setHash]=useState("");
- const[candidates,setCandidates]=useState<Option[]>(OPTIONS);
- const[round,setRound]=useState(1);
- const[lastAction,setLastAction]=useState("");
- const[verified,setVerified]=useState<boolean|null>(null);
+ const[stage,setStage]=useState<Stage>("guide");
+ const[target,setTarget]=useState<PredictionItem|null>(null);
+ const[candidates,setCandidates]=useState<PredictionItem[]>(PREDICTION_ITEMS);
+ const[round,setRound]=useState(0);
 
- const setup=useCallback(async()=>{
-   setStage("loading");setCandidates(OPTIONS);setRound(1);setLastAction("");setVerified(null);
-   const random=new Uint32Array(1);crypto.getRandomValues(random);
-   const chosen=OPTIONS[random[0]%OPTIONS.length];
-   const nextNonce=randomNonce();
-   const nextHash=await sha256(chosen.id+":"+nextNonce);
-   setTarget(chosen);setNonce(nextNonce);setHash(nextHash);setStage("intro");
- },[]);
+ useEffect(()=>{setTarget(createTarget())},[]);
 
- useEffect(()=>{void setup()},[setup]);
-
- const choose=async(option:Option)=>{
-   if(!target||candidates.length<=1)return;
-   const removable=candidates.find(item=>item.id!==target.id);
-   const removeId=option.id===target.id?(removable?.id??option.id):option.id;
-   const next=candidates.filter(item=>item.id!==removeId);
-   setLastAction(option.id===target.id?"ตัวเลือกนี้ถูกยึดเป็นจุดอ้างอิง":"ตัวเลือกนี้ถูกปล่อยออกจากสนาม");
-   setCandidates(next);
-   if(next.length===1){
-     const check=await sha256(target.id+":"+nonce);
-     setVerified(check===hash);
-     window.setTimeout(()=>setStage("reveal"),420);
-   }else setRound(v=>v+1);
+ const begin=()=>{
+  const nextTarget=target??createTarget();
+  setTarget(nextTarget);setCandidates(PREDICTION_ITEMS);setRound(0);setStage("sealed");
  };
 
- return <main className="game-shell game-theme-prediction"><div className="game-aurora" aria-hidden="true"/><GameHeader title="คำทำนายที่ปิดผนึก"/>
-  {stage==="loading"&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon motion-pulse"><Icon name="prediction"/></div><p className="eyebrow">Preparing commitment</p><h1 className="game-heading">กำลังปิดผนึกคำทำนาย</h1></section>}
-  {stage==="intro"&&target&&<section className="game-panel intro-panel scene-enter"><div className="intro-icon seal-motion"><Icon name="prediction"/></div><p className="eyebrow">SHA-256 commitment</p><h1 className="game-heading">คำตอบหนึ่งชิ้น<br/>ถูกล็อกไว้ก่อนคุณเลือก</h1><p className="game-lead">Fingerprint ด้านล่างสร้างจากคำตอบเป้าหมายและ nonce ก่อนเริ่มเกม คุณจะตรวจสอบความตรงกันได้ตอนจบ</p><div className="commitment-card"><span>SEALED FINGERPRINT</span><strong>{shortFingerprint(hash)}</strong><small>สร้างก่อนการตัดสินใจรอบแรก</small></div><button className="game-primary" onClick={()=>setStage("choice")}>เริ่มตัดสินใจ</button></section>}
-  {stage==="choice"&&<section className="game-panel choice-stage scene-enter"><div className="progress-track"><div className="progress-fill prediction-progress" style={{width:`${((OPTIONS.length-candidates.length)/(OPTIONS.length-1))*100}%`}}/></div><div className="stage-label"><span>{round}</span><b>Adaptive choice</b></div><h1 className="question-title">แตะสิ่งที่ดึงดูดคุณที่สุดในรอบนี้</h1><p className="question-help">การแตะแต่ละครั้งจะเปลี่ยนสนาม จนเหลือเส้นทางสุดท้ายเพียงหนึ่ง</p>{lastAction&&<p className="choice-feedback">{lastAction}</p>}<div className="prediction-choice-grid">{candidates.map(option=><button className="prediction-choice" key={option.id} onClick={()=>void choose(option)}><span><Icon name={option.icon}/></span><b>{option.label}</b></button>)}</div><div className="commitment-mini"><span>{shortFingerprint(hash)}</span><small>Fingerprint เดิม ไม่เปลี่ยนระหว่างเกม</small></div></section>}
-  {stage==="reveal"&&target&&<section className="game-panel intro-panel scene-enter reveal-scene"><p className="eyebrow">Commitment revealed</p><div className="prediction-reveal"><Icon name={target.icon}/><span className="prediction-orbit"/></div><h1 className="reveal-question">{target.label}</h1><p className="game-lead">นี่คือเป้าหมายที่ถูกใช้สร้าง Fingerprint ตั้งแต่ก่อนคุณเริ่มเลือก</p><div className="verification-card"><span className={verified?"verify-dot ok":"verify-dot"}/><div><strong>{verified?"ตรวจสอบ SHA-256 ตรงกัน":"ไม่สามารถยืนยันได้"}</strong><small>{shortFingerprint(hash)}</small></div></div><details className="proof-details"><summary>ดูข้อมูลสำหรับตรวจสอบ</summary><code>target={target.id}</code><code>nonce={nonce}</code><code>sha256={hash}</code></details><div className="reveal-actions"><button className="game-primary" onClick={()=>void setup()}>สร้างคำทำนายใหม่</button><a className="ghost-link" href="/">เลือกเกมอื่น</a></div></section>}
- </main>;
+ const choose=(picked:PredictionItem)=>{
+  if(!target)return;
+  let next:PredictionItem[];
+  if(picked.id===target.id){
+    const removable=candidates.find(item=>item.id!==target.id);
+    next=removable?candidates.filter(item=>item.id!==removable.id):candidates;
+  }else{
+    next=candidates.filter(item=>item.id!==picked.id);
+  }
+  setCandidates(next);setRound(v=>v+1);
+  if(next.length===1){setStage("reading");window.setTimeout(()=>setStage("result"),950)}
+ };
+
+ const restart=()=>{
+  setTarget(createTarget());setCandidates(PREDICTION_ITEMS);setRound(0);setStage("guide");
+ };
+
+ return <GameFrame title="คำทำนายที่ปิดผนึก" tone="prediction" steps={steps}>
+  {stage==="guide"&&<HowToPlay icon="prediction" title="คำทำนายที่ปิดผนึก" intro="ก่อนคุณตัดสินใจ เราจะซ่อนหนึ่งภาพไว้ แล้วให้คุณเดินผ่านตัวเลือกตามสัญชาตญาณจนถึงคำตอบสุดท้าย" steps={steps} onStart={begin}/>}
+  {stage==="sealed"&&<section className="stage stage-center stage-enter">
+    <div className="sealed-envelope"><Icon name="prediction"/><span/></div>
+    <p className="mini-kicker">ปิดผนึกแล้ว</p>
+    <h1>คำทำนายถูกซ่อนไว้เรียบร้อย</h1>
+    <p className="stage-copy">จากนี้เลือกตามความรู้สึกแรกของคุณ อย่าพยายามเดาว่าเราต้องการให้เลือกอะไร</p>
+    <button className="primary-control" onClick={()=>setStage("choice")}>เริ่มตัดสินใจ</button>
+  </section>}
+  {stage==="choice"&&target&&<section className="stage stage-center stage-enter">
+    <p className="mini-kicker">การตัดสินใจ {round+1}</p>
+    <h1>แตะหนึ่งสิ่งที่ดึงสายตาคุณที่สุด</h1>
+    <p className="stage-copy">เลือกเร็ว ๆ ตามสัญชาตญาณ แล้วปล่อยให้สนามเปลี่ยนไปเอง</p>
+    <div className="prediction-grid">{candidates.map(item=><button className="prediction-option" key={item.id} onClick={()=>choose(item)}><Icon name={item.icon}/><span>{item.label}</span></button>)}</div>
+  </section>}
+  {stage==="reading"&&<FocusStage icon="prediction" title="อย่าเปลี่ยนความรู้สึกตอนนี้..." copy="นึกถึงสิ่งที่เหลืออยู่ในหัวของคุณเพียงอย่างเดียว"/>}
+  {stage==="result"&&target&&<ReactionStage icon={target.icon} label={target.label} detail="นี่คือภาพที่ถูกปิดผนึกไว้ก่อนที่คุณจะเริ่มเลือก" onRestart={restart}/>}
+ </GameFrame>;
 }

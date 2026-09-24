@@ -1,0 +1,8 @@
+:root{
+  --bg:#070a12;--bg-soft:#0b1020;--surface:#0e1423;--surface-2:#121a2c;
+  --text:#f7f9ff;--muted:#98a3b8;--muted-2:#6f7a90;--line:rgba(255,255,255,.08);
+  --brand:#8d7cff;--cyan:#5edcff;--success:#63dfad;--danger:#ff8799;
+  --cards:#53d7ff;--number:#7c8dff;--symbol:#ee72d5;--word:#68dfb1;--prediction:#ff9a73;
+  --r-sm:12px;--r-md:18px;--r-lg:26px;--r-xl:34px;
+  --shadow:0 24px 70px rgba(0,0,0,.28);--content:1180px;--game:920px;
+}
