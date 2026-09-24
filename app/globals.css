@@ -370,3 +370,21 @@ html{scroll-behavior:smooth}body{overflow-x:hidden}.topnav{display:flex;align-it
 @media (min-width:1100px){.topbar,.section,.hero,.about{max-width:var(--content-max);margin-inline:auto}.game-list{grid-template-columns:repeat(3,minmax(0,1fr))}.feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{min-height:78vh}.game-panel{max-width:920px;margin-inline:auto}.answer-bar{position:static;max-width:650px;margin:28px auto 0;background:transparent;backdrop-filter:none;padding:0}.number-grid,.symbol-grid{padding-bottom:0}}
 @media (orientation:landscape) and (max-height:650px){.hero{min-height:auto;padding-block:54px}.mind-orb,.orb{transform:scale(.88)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+
+/* MindPlay game UX polish */
+.game-status-dot{width:9px;height:9px;border-radius:50%;background:rgba(163,123,255,.9);box-shadow:0 0 18px rgba(133,94,255,.7)}
+.modern-game .game-panel{max-width:860px}
+.game-lead{max-width:620px;margin:14px auto 0;line-height:1.75;opacity:.78;text-align:center}
+.stage-label{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0 8px}
+.stage-label span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(133,94,255,.18);border:1px solid rgba(255,255,255,.08);font-weight:800}
+.stage-label b{font-size:.92rem;opacity:.82}
+.choice-stage{display:flex;flex-direction:column;justify-content:center;min-height:62vh}
+.choice-grid{display:grid;grid-template-columns:1fr;gap:12px;max-width:680px;margin:28px auto 0;width:100%}
+.choice-card{min-height:78px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);color:inherit;font:inherit;font-weight:800;cursor:pointer}
+.choice-card:active{transform:scale(.985)}
+.sealed-card{display:grid;gap:12px;max-width:480px;margin:26px auto;padding:24px;border-radius:24px;background:linear-gradient(145deg,rgba(133,94,255,.14),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.08)}
+.sealed-card span{padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.18);font-weight:800}
+.playing-card{aspect-ratio:5/7;min-height:0}
+.playing-card span{font-size:clamp(1.45rem,5vw,2.25rem)}
+@media(min-width:700px){.choice-grid{grid-template-columns:repeat(3,1fr)}.playing-card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1100px){.modern-game .game-panel{max-width:900px}.choice-card:hover{background:rgba(255,255,255,.075);transform:translateY(-2px)}}

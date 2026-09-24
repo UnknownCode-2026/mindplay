@@ -8,10 +8,10 @@ type Stage = "intro" | "questions" | "reading" | "reveal" | "success" | "retry";
 const roundMessages = [
   "เลขของคุณอยู่ในนี้ไหม?",
   "ดูให้ดีอีกครั้ง...",
-  "ผมเริ่มตัดตัวเลือกออกได้แล้ว",
-  "ตอนนี้เหลือไม่มากแล้ว",
+  "ลองสังเกตชุดนี้ให้ดี",
+  "อย่ารีบตอบ ดูให้แน่ใจก่อน",
   "อย่าเปลี่ยนเลขนะ",
-  "ผมคิดว่าผมใกล้เจอแล้ว",
+  "อีกนิดเดียว",
   "ตอบครั้งสุดท้าย...",
 ];
 
@@ -60,10 +60,10 @@ export default function NumberMindGame() {
   if (stage === "intro") {
     return (
       <main className="game-shell">
-        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill">V1.3</span></div>
+        <div className="game-topbar"><a href="/" className="back-button">←</a><span>อ่านตัวเลขในใจ</span><span className="version-pill"></span></div>
         <section className="game-panel intro-panel">
           <div className="mind-orb">🧠</div>
-          <p className="eyebrow">โหมดคลาสสิกจาก V1.2</p>
+          <p className="eyebrow">คิดเลขหนึ่งตัวไว้ในใจ</p>
           <h1 className="game-heading">เลือกเลขหนึ่งตัว<br/><span>ตั้งแต่ 1 ถึง 100</span></h1>
           <div className="rules">
             <p>จำมันไว้ในหัว</p>

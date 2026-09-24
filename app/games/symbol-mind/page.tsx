@@ -14,7 +14,7 @@ type Stage = "intro" | "questions" | "reading" | "reveal" | "success" | "retry";
 const roundMessages = [
   "สัญลักษณ์ของคุณอยู่ในกลุ่มนี้ไหม?",
   "ลองมองอีกครั้งให้แน่ใจ...",
-  "ตอนนี้ผมเริ่มเห็นภาพแล้ว",
+  "ลองดูอีกชุดหนึ่ง",
   "ตอบครั้งสุดท้าย...",
 ];
 
@@ -78,11 +78,11 @@ export default function SymbolMindGame() {
         <div className="game-topbar">
           <a href="/" className="back-button" aria-label="กลับหน้าหลัก">←</a>
           <span>สัญลักษณ์ลับ</span>
-          <span className="version-pill">V1.3</span>
+          <span className="version-pill"></span>
         </div>
         <section className="game-panel intro-panel">
           <div className="mind-orb symbol-orb">👁️</div>
-          <p className="eyebrow">โหมดคลาสสิกจาก V1.2</p>
+          <p className="eyebrow">เลือกสัญลักษณ์หนึ่งตัวไว้ในใจ</p>
           <h1 className="game-heading">เลือกสัญลักษณ์หนึ่งตัว<br/><span>แล้วจำไว้ในหัว</span></h1>
           <div className="symbol-preview-grid" aria-label="ตัวอย่างสัญลักษณ์">
             {["🌙","🔥","💎","⚡","🦋","🍀","⭐","👑"].map((symbol) => <span key={symbol}>{symbol}</span>)}

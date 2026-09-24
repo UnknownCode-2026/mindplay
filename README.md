@@ -1,14 +1,13 @@
-# 🧠 MindPlay V1.3
-Game Rework + Responsive + Performance Update
+# 🧠 MindPlay V1.4
 
-## ไฮไลต์
-- 🃏 ไพ่ที่หายไป
-- 🧠 เลขที่หนีไม่พ้น
-- เกมเลขและสัญลักษณ์เดิมย้ายเป็นโหมดคลาสสิก
-- Responsive: Mobile / Tablet / Desktop
-- เพิ่ม Loading, 404, Metadata และ Open Graph
-- ปรับ Performance, Animation และ reduced motion
-- ไม่ใช้กล้อง ไมค์ Login หรือฐานข้อมูล
+Bug Fix + Game UX Rework
 
-## Tech
-Next.js 16 / React 19 / TypeScript / Vercel
+- ลบข้อความเวอร์ชันออกจากหน้าเว็บไซต์และหน้าเกม
+- คงดีไซน์หน้า Home เดิม
+- ปรับ UI/UX หน้าเกมให้เป็น Game Stage มากขึ้น
+- ปรับเกมไพ่ที่หายไป
+- ปรับเลขที่หนีไม่พ้นให้มีหลาย Sequence
+- ปรับข้อความเกมเลขและสัญลักษณ์
+- เปิดเกมคำทำนายที่ปิดผนึกเป็นเกมที่ 5
+- ปรับ Responsive สำหรับ Mobile / Tablet / Desktop
+- Version ภายในโปรเจกต์: 1.4.0
